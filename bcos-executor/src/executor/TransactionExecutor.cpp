@@ -48,6 +48,7 @@
 #include "../precompiled/extension/RingSigPrecompiled.h"
 #include "../precompiled/extension/UserPrecompiled.h"
 #include "../precompiled/extension/ZkpPrecompiled.h"
+#include "../precompiled/extension/HelloWorldPrecompiled.h"
 #include "../vm/Precompiled.h"
 
 #ifdef WITH_WASM
@@ -266,13 +267,16 @@ void TransactionExecutor::initEvmEnvironment()
     m_constantPrecompiled->insert(
         {RING_SIG_ADDRESS, std::make_shared<precompiled::RingSigPrecompiled>(m_hashImpl)});
 
+    // insert test precompiled contract
+    auto helloPrecompiled = std::make_shared<precompiled::HelloWorldPrecompiled>(m_hashImpl);
+    m_constantPrecompiled->insert({"0000000000000000000000000000000000005001", helloPrecompiled}); //std::move(helloPrecompiled)
+
     set<string> builtIn = {CRYPTO_ADDRESS, GROUP_SIG_ADDRESS, RING_SIG_ADDRESS};
     m_builtInPrecompiled = make_shared<set<string>>(builtIn);
 
     // create the zkp-precompiled
     m_constantPrecompiled->insert(
         {DISCRETE_ZKP_ADDRESS, std::make_shared<bcos::precompiled::ZkpPrecompiled>(m_hashImpl)});
-
 
     // test precompiled
     CpuHeavyPrecompiled::registerPrecompiled(m_constantPrecompiled, m_hashImpl);
